@@ -1,0 +1,21 @@
+version: '2.2'
+
+services:
+  create_certs:
+    container_name: create_certs
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+    command: >
+      bash -c ' 
+        if [[ ! -f /certs/bundle.zip ]]; then
+          mkdir -p /certs
+          bin/elasticsearch-certutil cert --silent --pem --in config/certificates/instances.yml -out /certs/bundle.zip;
+          unzip /certs/bundle.zip -d /certs; 
+        fi;
+        ls
+        chown -R 1000:0 /certs
+      '
+    user: "0"
+    working_dir: /usr/share/elasticsearch
+    volumes:
+       - $PWD/cert:/usr/share/elasticsearch
+
